@@ -1,0 +1,12 @@
+#components {
+    position: fixed;
+    right: 0;
+    top: 0;
+    width: 200px; /* Adjust as needed */
+    height: 100%;
+    overflow: auto;
+}
+
+#content {
+    margin-right: 220px; /* Adjust as needed */
+}
