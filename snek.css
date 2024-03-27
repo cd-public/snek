@@ -1,12 +1,46 @@
-#table-of-contents {
-    position: fixed;
-    right: 0;
-    top: 0;
-    width: 200px; /* Adjust as needed */
-    height: 100%;
-    overflow: auto;
+/* CSS for wide screens */
+@media (min-width: 1200px) {
+    #table-of-contents {
+        position: fixed;
+        right: 0;
+        top: 0;
+        width: 200px;
+        /* Adjust as needed */
+        height: 100%;
+        overflow: auto;
+        display: block;
+        /* Make sure the table of contents is visible */
+    }
+
+    #table-of-contents ul ul {
+        padding-left: 10px;
+        /* Adjust as needed */
+    }
+
+    #components2 {
+        list-style-type: none;
+        /* Removes bullet points or numbers from lists */
+    }
+
+    #components2::before {
+        content: "";
+        /* Removes content added before the element */
+    }
+
+    #content {
+        margin-right: 220px;
+        /* Adjust as needed */
+    }
 }
 
-#content {
-    margin-right: 220px; /* Adjust as needed */
+/* CSS for narrow screens */
+@media (max-width: 1199px) {
+    #table-of-contents {
+        display: none;
+        /* Hide the table of contents */
+    }
+
+    #content {
+        margin-right: 0;
+    }
 }

@@ -93,7 +93,7 @@
 </ul>
 
 <div id="table-of-contents">
-<h2 id="components">Components</h2>
+<h2 id="components2">Components</h2>
 
 <ul>
   <li><a href="#main">Main</a></li>
@@ -116,7 +116,7 @@
 </ul>
 </div>
 
-<p>I recommend constructing independent executable programs that implement, loosely speaking, the functionalities of each of these sub-tasks, then composing them into a comprehensive program that implements the snake game. These are outlined as "check-ins" within in each section.</p>
+<p>I recommend constructing independent executable programs that implement, loosely speaking, the functionalities of each of these sub-tasks, then composing them into a comprehensive program that implements the snake game. These are outlined as "check-ins" within each section.</p>
 
 <h1 id="main">Main</h1>
 
@@ -175,7 +175,7 @@ int r = rand();    // A pseudo-random integer in [0,RAND_MAX]</code></pre>
 #include &lt;fcntl.h&gt;      // for fcntl()
 
 // sockets
-#define PORT 0xC399     // get it? CS 399?
+#define PORT 0xC271     // get it? CS 271?
 #define DOMAIN AF_INET6 // ipv6
 #define LOOPBACK "::1"  // "loopback" ipv6 - network locally
 
@@ -213,7 +213,7 @@ typedef struct sockaddr *add4;</code></pre>
 
 <h4 id="check0">Check-in 0</h4>
 
-<p>To test that your main is ready to support all critical tasks, just configure it to call simple wrapper functions with print statements as stand-ins for latter networking and gameplay tasks.Once you have a main function that you can demonstrate does the required work of conditionally calling different functions based on command line arguments, you have a basis from which to develop the remaining functionalities of snek.c, and can always return to include, define, or initialize anything else you may need. In the reference implementation, this was implemented as a single main function with the following declaration:</p>
+<p>To test that your main is ready to support all critical tasks, just configure it to call simple wrapper functions with print statements as stand-ins for later networking and gameplay tasks. Once you have a main function that you can demonstrate does the required work of conditionally calling different functions based on command line arguments, you have a basis from which to develop the remaining functionalities of snek.c, and can always return to include, define, or initialize anything else you may need. In the reference implementation, this was implemented as a single main function with the following declaration:</p>
 
 <pre><code>int main(int argc, char const *argv[]);</code></pre>
 
@@ -243,9 +243,9 @@ connect(sock, &address, sizeof(address));
 write(sock, argv[1], strlen(argv[1]));</code></pre>
 
 <p>This code implements a single write-to-socket event, and writes a string of arbitrary length. However,
-it is otherwise similar to required tasks of the client.</p>
+it is otherwise similar to the required tasks of the client.</p>
 
-<p>While this code is provided as is, it could be improved in many ways - in the reference implementation, the socket, once created, is passed to a second function that handles the repeated sends in a loop, in which case the socket either needs to be malloc'ed or the looping function must be nested. Similarly, many of the setup operations here are common with the server and may be suitable for code factorization. Further, this code contains a number of lines triggering gcc warnings that should be addressed with casts. Lastly, many of the socket library functions can return error cases and aught to be error checked, to exit gracefully rather than drawing a segmentation fault. While a suitable base implementation, this sample code should be taken more as an inspiration than as a partial solution.</p>
+<p>While this code is provided as is, it could be improved in many ways - in the reference implementation, the socket, once created, is passed to a second function that handles the repeated sends in a loop, in which case the socket either needs to be malloc'ed or the looping function must be nested. Similarly, many of the setup operations here are common with the server and may be suitable for code factorization. Further, this code contains a number of lines triggering gcc warnings that should be addressed with casts. Lastly, many of the socket library functions can return error cases and ought to be error checked, to exit gracefully rather than drawing a segmentation fault. While a suitable base implementation, this sample code should be taken more as inspiration than as a partial solution.</p>
 
 <h4 id="check1">Check-in 1</h4>
 
@@ -263,7 +263,7 @@ The role of the <code>client()</code> function is primarily to configure and con
 
 <p>The primary role of gameplay on the client side is to read in user input and prepare it to be transmitted over the network. There are a variety of ways to implement this task, but all must contend with the central challenge that a message must be sent once per second, so the system may not naively block on a <code>fgets()</code> or similar blocking input call, and at some point the user input must compared against some acceptable list of inputs. In the reference implementation, the most recent valid input is maintained, and updated if a new valid input is provided. This is the single byte that is sent over the network every second. Of the valid inputs, only one, the quit input, yields any specific actions on the client.</p>
 
-<p>You are welcome to choose what inputs you would like to use for snek, but minimally must support four directional inputs. The reference implementation supports six, the four directions, and quit, and a restart.<p>
+<p>You are welcome to choose what inputs you would like to use for snek, but at a minimum must support four directional inputs. The reference implementation supports six: the four directions, quit, and restart.<p>
 
 <p>The core tension in the client is that gameplay wants to be interrupt (that is, user) driven, and networking wants to be timer driven. We can resolve this in part by configuring reads from <code>stdin</code> to be <i>non-blocking</i> - that is, to always return within one second of being called, and simply return with no new data if there is no new data to return. There are plenty of ways to do this. The <a href="https://man7.org/linux/man-pages/man2/fcntl.2.html"><code>fnctl()</code></a> function is used in the reference implementation to configure <code>stdin</code> to be non-blocking. <a href="https://stackoverflow.com/questions/717572/how-do-you-do-non-blocking-console-i-o-on-linux-in-c">Read more here.</a></p>
 
@@ -275,23 +275,23 @@ if (numRead > 0) {
 	printf("You said: %s", buf);
 }</code></pre>
 
-<p>Synchronization could be handled in networking components of either the client or the server, or handled at display time on the server, but client side gameplay was the simpliest and earliest site to resolve the interrupt/timing conflict, and allowed the rest of the code to proceed using standard blocking calls. An early version of the reference implementation used <code>setsockopt()</code> to configure the socket used by the server to capture commands from the client, but this implementation yielded undesirable complexity on server side.</p>
+<p>Synchronization could be handled in networking components of either the client or the server, or handled at display time on the server, but client side gameplay is the simpliest and earliest site to resolve the interrupt/timing conflict, and allows the rest of the code to proceed using standard blocking calls. An early version of the reference implementation used <code>setsockopt()</code> to configure the socket used by the server to capture commands from the client, but this implementation yielded undesirable complexity on server side.</p>
 
 <h4 id="check2">Check-in 2</h4>
 
-</p>To test that your client is ready to support gameplay independently of the networking implementation, just configure it to print to console, once per second, the most recent input character. Play around with it a bit and get a sense for how the console works, especially with respect to input lines of text and the enter key. Once you can accept input at any time, and generate output on a timer, you simply can connect the gameplay and networking elements and have a client that transmits game inputs to the game server. In the reference implementation, this was implemented as a single client-specific function with the following declaration:</p>
+</p>To test that your client is ready to support gameplay independently of the networking implementation, just configure it to print to console, once per second, the most recent input character. Play around with it a bit and get a sense for how the console works, especially with respect to input lines of text and the enter key. Once you can accept input at any time, and generate output on a timer, you can simply connect the gameplay and networking elements and have a client that transmits game inputs to the game server. In the reference implementation, this was implemented as a single client-specific function with the following declaration:</p>
 
 <pre><code>int cloop(int *sock);</code></pre>
 
-Additionally, one small helper function was used to maintain the input buffer in <code>cloop()</code> but a string library function such as <a href="https://man7.org/linux/man-pages/man3/memset.3.html"><code>memset()</code></a> would also be suitable. <code>cloop()</code> contains a single <code>while(1)</code> loop containing two main if statements. Using functions from <code>&lt;time.h&gt;</code>, the loop ran at least once per second and whenever receiving new user input. If the loop ran one second or more since last sending a message to the client, a new message would be sent to the server.</p>
+Additionally, one small helper function was used to maintain the input buffer in <code>cloop()</code>, but a string library function such as <a href="https://man7.org/linux/man-pages/man3/memset.3.html"><code>memset()</code></a> would also be suitable. <code>cloop()</code> contains a single <code>while(1)</code> loop containing two main if statements. Using functions from <code>&lt;time.h&gt;</code>, the loop ran at least once per second and whenever receiving new user input. If the loop ran one second or more since last sending a message to the client, a new message would be sent to the server.</p>
 
 <h1 id="server">Server</h1>
 
-<p>For this project, the role of the server is to accept network inputs sent by the client and to maintain, update, and display game state. Doing so offers a number of programming challenges.</p>
+<p>For this project, the role of the server is to accept network inputs sent by the client and to maintain, update, and display the game state. Doing so offers a number of programming challenges.</p>
 
 <h2 id="snet">Networking (Server-side)</h1>
 
-The primary role of networking on the client side is to receive pre-processed inputs from the client. There are a variety of ways to implement this task, but the reference implementation simply waits to receive a message from the client then implements an single gameplay update before blocking again and waiting for another message.
+The primary role of networking on the client side is to receive pre-processed inputs from the client. There are a variety of ways to implement this task, but the reference implementation simply waits to receive a message from the client then implements a single gameplay update before blocking again and waiting for another message.
 
 This is similar in spirit to the provided sample code in server.c, which is markedly more complex than client.c:
 
@@ -318,7 +318,7 @@ read(connection, buffer, BUFF_SIZE);
 printf("%s\n",buffer ); </code></pre>
 
 <p>This code implements a single read-from-socket event, and reads a string of arbitrary length. However,
-it is otherwise similar to required tasks of the client. Compositionally, this code assembles a socket, sets socket options using helpful boilerplate to enable socket reuse on the same ports for testing, then completes the bind-listen-connect process to create a connection from which data may be read.</p>
+it is otherwise similar to the required tasks of the client. Compositionally, this code assembles a socket, sets socket options using helpful boilerplate to enable socket reuse on the same ports for testing, then completes the bind-listen-connect process to create a connection from which data may be read.</p>
 
 <p>All the considerations of the provided client.c code also apply to this code.</p>
 
@@ -336,7 +336,7 @@ it is otherwise similar to required tasks of the client. Compositionally, this c
 
 <h2 id="sgame">Gameplay (Network-side)</h1>
 
-<p>The gameplay server is perhaps the most intensive part of this project as it requires maintaining an internal state and responding to input over network. To make it more manageable, I decomposed it into three sub-tasks of roughly equal intensity, that are then composed within the <code>sloop()</code> function called from <code>server()</code></p> which we can think of as producing the gameplay window given both user commands and internal state.</p>
+<p>The gameplay server is perhaps the most intensive part of this project as it requires maintaining an internal state and responding to input over network. To make it more manageable, I have decomposed it into three sub-tasks of roughly equal intensity, that are then composed within the <code>sloop()</code> function called from <code>server()</code> which we can think of as producing the gameplay window given both user commands and internal state.</p>
 
 <p>In brief, the snake is directed by the player to "eat" the food on the screen, which causes the snake to increase in size. The goal of the game is for the player to direct the snake to increase in size until filling the entire game window without causing the snake to collide with either a boundary or the snake's own tail.</p>
 
@@ -350,7 +350,7 @@ it is otherwise similar to required tasks of the client. Compositionally, this c
 
 <p>Each of these elements is subject to certain requirements.</p>
 
-<p>Bounding elements are statically maintained in the highest and lowest indexed each of both rows and columns, and unalterable through gameplay. Food item and snake elements may not occupy any space wherein a bounding element is present. Food item elements, placed by the gameplay server, must be restricted not to be placed in the same grid location as a bounding element. Snake elements, as they are directed by user input, may be directed into grid locations in which bounding elements are present, but doing so results in the game terminating in a loss for the player.</p>
+<p>Bounding elements are statically maintained in the highest and lowest indexed locations of both rows and columns, and are unalterable through gameplay. Food item and snake elements may not occupy any space wherein a bounding element is present. Food item elements, placed by the gameplay server, must be restricted not to be placed in the same grid location as a bounding element. Snake elements, as they are directed by user input, may be directed into grid locations in which bounding elements are present, but doing so results in the game terminating in a loss for the player.</p>
 
 <p>Food item elements are placed randomly at any point within the grid unoccupied by another gameplay element, whether a bounding elements or a snake element. Snake elements, as they are directed by user input, may be directed into grid locations in which a food item element is present. If a snake element is moved onto the grid location of a food element, the gameplay state is updated in the following way: a new snake element is created at the location of the food element, and all other snake elements are maintained in their current location. Additionally, a new food element is created at a randomized location where no other gameplay elements are present. If there are no locations in the grid that are unoccupied by either bounding or snake elements, the game concludes with a victory for the player.</p>
 
@@ -360,9 +360,9 @@ it is otherwise similar to required tasks of the client. Compositionally, this c
 
 <p>As bounding elements are static, in the reference implementation their location is only considered during rendering, and all gameplay is modelled as if occuring in a 78-by-21 sized grid with no bounding elements present.</p>
 
-<p>In the reference implementation, the food item location is maintained as a single integer array of length two capturing the coordinates the food item in the game space.</p>
+<p>In the reference implementation, the food item location is maintained as a single integer array of length two capturing the coordinates of the food item in the game space.</p>
 
-<p>In the reference implementation, the location of all snake elements is maintained in a linked list where the most recently added element is at the head of the list and the least recently added element is at the tail of the list. Doing so enables tracking which elements should be updated. Like the food item element, snake elements are tracked as integer array of length two.</p>
+<p>In the reference implementation, the location of all snake elements is maintained in a linked list where the most recently added element is at the head of the list and the least recently added element is at the tail of the list. Doing so enables tracking which elements should be updated. Like the food item element, snake elements are tracked as an integer array of length two.</p>
 
 <p>With bounding elements untracked, the reference implementation maintains the entire gameplay state in a single data structure holding both the location of the food item as an integer array of length two and the location of the snake as a custom linked list structure. For the snake, this means all state updates can be performed with head append and tail pop operations.</p>
 
@@ -392,11 +392,11 @@ typedef list game;
 // pop tail
 void popt(game curr);</code></pre>
 
-<h3 id="state">Commands</h1>
+<h3 id="cmd">Commands</h1>
 
 <p>The reference snek implementation supports six total commands: four directional commands, a quit command, and a restart command.  By default, these are mapped to "wasdqr" but are implemented using <code>#define</code> for customizability. The directions correspond to changes within the game state, and the other correspond to changes to the program state.</p>
 
-<p>If the game state is not initialized, the previous game state was a player win or loss, or a restart command is received, the existing game state is discarding and random locations for the food item element and a single snake item element are set. In the reference implementation is factored into an <code>init()</code> function. As a nicety in the reference implementation, the food item is placed randomly of all game spaces and the snake is placed randomly within the subset of the gamespace closer to the center point than to the boundary elements.</p>
+<p>If the game state is not initialized, the previous game state was a player win or loss, or a restart command is received, the existing game state is discarded and random locations for the food item element and a single snake item element are set. In the reference implementation this is factored into an <code>init()</code> function. As a nicety, in the reference implementation the food item is placed randomly of all game spaces and the snake is placed randomly within the subset of the gamespace closer to the center point than to the boundary elements.</p>
 
 <p>If the quit command is received, the program exits gracefully by returning up the call stack to main, which should return <code>0</code>. When this occurs, the client should already have exited gracefully in the same manner immediately after transmitting the quit code.</p>
 
@@ -461,15 +461,15 @@ game move(char dirc, game curr);</code></pre>
 
 <h4 id="check6">Check-in 6</h4>
 
-<p>To test that your server is ready to display game state, is suffices to implement a single function that takes as input a gamestate and renders it to console with one or more call to <code>printf()</code>. This can be implement in part before considering gamestate storage as a <code>NULL</code> gamestate should be renderable, simply without displaying any snake and food item elements.</p>
+<p>To test that your server is ready to display game state, it suffices to implement a single function that takes as input a gamestate and renders it to the console with one or more calls to <code>printf()</code>. This can be implemented in part before considering gamestate storage as a <code>NULL</code> gamestate should be renderable, simply without displaying any snake and food item elements.</p>
 
-<p>In the reference implementation, a single function used a doubly nested loop that assembled and then printed the game window line-by-line to console with a single internal working buffer large enough to hold one line at a time. However, many alterative implementations would also suffice and could make other aspects of the gameplay server implementation simpler.</p>
+<p>In the reference implementation, a single function used a doubly nested loop that assembled and then printed the game window line-by-line to console with a single internal working buffer large enough to hold one line at a time. However, many alternative implementations would also suffice and could make other aspects of the gameplay server implementation simpler.</p>
 
 <pre><code>void show(game curr);</code></pre>
 
 <h1 >Completion</h1>
 
-<p>With all functionalities of the snake game implemented, the final stages are to compose the elements together create a single cohesive gameplay experience.</p>
+<p>With all functionalities of the snake game implemented, the final stages are to compose the elements together to create a single cohesive gameplay experience.</p>
 
 <p>In the reference implementation, the client proceeds from <code>main()</code> to <code>client()</code> which uses <code>void get_sock();</code> to create a socket that is passed to <code>cloop()</code>. In the reference implementation, these are nested as return calls, such that <code>cloop()</code> returns when encountering a quit command, <code>client()</code> returns the return value of <code>cloop()</code>, and <code>main()</code> returns the return value of <code>client()</code>. This also allows non-zero return values, denoting errors, to be passed up the call stack.</p>
 
